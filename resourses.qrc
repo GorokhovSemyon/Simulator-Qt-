@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/tnpa.png</file>
+    </qresource>
+</RCC>
