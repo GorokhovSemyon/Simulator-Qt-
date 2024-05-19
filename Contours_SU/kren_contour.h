@@ -1,7 +1,5 @@
 #ifndef KREN_CONTOUR_H
 #define KREN_CONTOUR_H
-#include "../gamak_protocols/common/define.h"
-#include "computingblock.h"
 #include "su_coreblock.h"
 
 extern float K[SIZE_OF_K];

@@ -1,7 +1,5 @@
 #include "depth_contour.h"
-//#include "mainwindow.h"
 #include <QDebug>
-//#include "navform.h"
 
 depth_contour::depth_contour(Exchange_structures *_exch_str)
 {

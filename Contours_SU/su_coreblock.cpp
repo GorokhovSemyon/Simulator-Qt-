@@ -1,5 +1,4 @@
 #include "su_coreblock.h"
-#include "mainwindow.h"
 
 SU_CoreBlock::SU_CoreBlock(float delta)
 {

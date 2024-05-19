@@ -1,15 +1,6 @@
 #ifndef DEPTH_CONTOUR_H
 #define DEPTH_CONTOUR_H
 
-//#include "../gamak_protocols/protocolFromPult.h"
-
-//#include "../gamak_protocols/common/define.h"
-//#include "computingblock.h"
-//#include "su_coreblock.h"
-
-//extern float K[SIZE_OF_K];
-//extern float X[SIZE_OF_X][2];
-
 #include "common/exchange_structures.h"
 
 class depth_contour

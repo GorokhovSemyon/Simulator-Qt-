@@ -1,7 +1,4 @@
 #include "kurs_contour.h"
-//#include "mainwindow.h"
-//#include "navform.h"
-//#include "navigationalgoritm.h"
 
 kurs_contour::kurs_contour(float delta)
 {

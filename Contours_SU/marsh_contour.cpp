@@ -1,9 +1,5 @@
-//#include "mainwindow.h"
 #include "marsh_contour.h"
 #include <QDebug>
-//#include "navigationalgoritm.h"
-//#include "navform.h"
-
 
 Marsh_contour::Marsh_contour(float delta)
 {
