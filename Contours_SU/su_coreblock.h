@@ -1,6 +1,7 @@
 #ifndef SU_COREBLOCK_H
 #define SU_COREBLOCK_H
 #include <QObject>
+#include "../gamak_protocols/common/define.h"
 
 extern float K[SIZE_OF_K];
 extern float X[SIZE_OF_X][2];

@@ -1,21 +1,22 @@
-#include "altitude.h"
-#include "ui_altitude.h"
+#include "depth.h"
+#include "ui_depth.h"
 
-Altitude::Altitude(Exchange_structures *_exch_str, QWidget *parent) :
+Depth::Depth(Exchange_structures *_exch_str, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Altitude)
+    ui(new Ui::Depth)
 {
     exch_str = _exch_str;
+    depth = 0;
 
     ui->setupUi(this);
 }
 
-Altitude::~Altitude()
+Depth::~Depth()
 {
     delete ui;
 }
 
-void Altitude::paintEvent(QPaintEvent *)
+void Depth::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     QFont font;
@@ -41,7 +42,7 @@ void Altitude::paintEvent(QPaintEvent *)
     font.setPointSize(7);
     painter.setFont(font);
 
-    int newAltitude = exch_str->from_data.params.Y * koef;
+    int newAltitude = (MAX_ATLITUDE - exch_str->from_data.params.Y) * koef;
 
     for (int i = 0; i <= MAX_ATLITUDE*koef; i += STEP) //для делений с числовыми пометками (0, 10, 20...)
     {
@@ -72,19 +73,18 @@ void Altitude::paintEvent(QPaintEvent *)
     painter.drawRect(15, -10, 35, 20);
     painter.drawText(16, -10, 35, 20,
                     Qt::AlignHCenter | Qt::AlignVCenter,
-                    QString::number((int)exch_str->from_data.params.Y));
+                    QString::number((int)(MAX_ATLITUDE - exch_str->from_data.params.Y)));
 
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::red);
-    painter.drawConvexPolygon(mark_altitude, 4);
+    painter.drawConvexPolygon(mark_depth, 4);
 
     painter.restore();
 }
 
 //--------------------------------------------------
 
-void Altitude::setAltitude(int _altitude)
+void Depth::setDepth()
 {
-    exch_str->from_data.params.Y = _altitude;
     update();
 }

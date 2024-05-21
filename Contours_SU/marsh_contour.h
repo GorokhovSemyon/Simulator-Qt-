@@ -1,31 +1,25 @@
 #ifndef MARSH_CONTOUR_H
 #define MARSH_CONTOUR_H
 
+#include "math.h"
+
+#include "common/exchange_structures.h"
+
+
 class Marsh_contour
 {
 public:
-    Marsh_contour(float delta);
+    Marsh_contour(Exchange_structures *_exch_str);
 
-//    ComputingBlock *coreBlock;
-//    NavigationAlgoritm* nav_algorithm;
-//    SU_CoreBlock* core_SU;
+    Exchange_structures* exch_str;
 
     unsigned short int highfreq_ims_reinit=1;
-    float U_marsh;
+    float U_marsh = 0;
     float delta_t;
-    float* target_radius; ///---расчитываемый радиус стабилизации
-    bool accept_workDepthMArshTogerther;
+    float distance; ///---расчитываемый радиус стабилизации
     bool navigate_complete; ///--- флаг о завершении алгоритма наведения
 
-    void main_block(float Input, int Regim, int flagUpravleniya, int type_control);
-    void Marsh_po_SVS();
-    void Marsh_po_AL();
-    void core_FeedBack_Distance_Speed();
-
-//    void setTargetParam(PointTargetingParameters *value);
-
-//private:
-//    PointTargetingParameters* targetParam;
+    void main_block();
 };
 
 

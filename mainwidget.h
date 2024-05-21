@@ -21,6 +21,7 @@
 #include "Control/hyrohorizont.h"
 #include "Control/vma.h"
 #include "Control/altitude.h"
+#include "Control/depth.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
@@ -44,6 +45,7 @@ public:
     HyroHorizont* hyrohorizont = nullptr;
     VMA* vma = nullptr;
     Altitude* altitude = nullptr;
+    Depth* depth = nullptr;
 
     QStringList ConfigList;
     ConfigData* config = nullptr;

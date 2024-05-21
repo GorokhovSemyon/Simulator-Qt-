@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1124</width>
-    <height>656</height>
+    <height>709</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,7 +123,7 @@ QGroupBox:title
                 <enum>Qt::ClickFocus</enum>
                </property>
                <property name="text">
-                <string>10</string>
+                <string>0</string>
                </property>
                <property name="frame">
                 <bool>true</bool>
@@ -198,7 +198,7 @@ QGroupBox:title
                 <enum>Qt::ClickFocus</enum>
                </property>
                <property name="text">
-                <string>0</string>
+                <string>10</string>
                </property>
               </widget>
              </item>
@@ -558,7 +558,7 @@ QGroupBox:title
                 </font>
                </property>
                <property name="text">
-                <string>0</string>
+                <string>10</string>
                </property>
               </widget>
              </item>
@@ -971,7 +971,7 @@ QGroupBox:title
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_7">
+           <widget class="QPushButton" name="btn_set_params">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -1042,41 +1042,7 @@ QGroupBox:title
           <string>Контроль</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="0" column="0" rowspan="3">
-           <widget class="QWidget" name="widget" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <layout class="QHBoxLayout" name="hlay_VMA"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="1" rowspan="5">
-           <widget class="Line" name="line_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" rowspan="5">
+          <item row="0" column="2" rowspan="4">
            <widget class="QFrame" name="frame_2">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
@@ -1098,7 +1064,61 @@ QGroupBox:title
               <number>0</number>
              </property>
              <item>
-              <layout class="QHBoxLayout" name="hlay_Compass"/>
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="font">
+                <font>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QGroupBox
+{
+	border: 1px solid black;
+	border-radius: 9px;
+	margin-top: 1em;
+}
+
+QGroupBox:title
+{
+	left: 20px;
+	top: -15px;
+	padding: 0 3px 0 3px;
+}</string>
+               </property>
+               <property name="title">
+                <string>Компас</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_21">
+                <property name="leftMargin">
+                 <number>2</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>2</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>2</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlay_Compass">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
               <widget class="Line" name="line_3">
@@ -1108,12 +1128,60 @@ QGroupBox:title
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="hlay_HyroHorizont"/>
+              <widget class="QGroupBox" name="groupBox_23">
+               <property name="font">
+                <font>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QGroupBox
+{
+	border: 1px solid black;
+	border-radius: 9px;
+	margin-top: 1em;
+}
+
+QGroupBox:title
+{
+	left: 20px;
+	top: -15px;
+	padding: 0 3px 0 3px;
+}</string>
+               </property>
+               <property name="title">
+                <string>Гирогоризонт</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_22">
+                <property name="leftMargin">
+                 <number>2</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>2</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>2</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlay_HyroHorizont"/>
+                </item>
+               </layout>
+              </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="0" column="1" rowspan="4">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
            <widget class="QWidget" name="widget_2" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <property name="leftMargin">
@@ -1129,19 +1197,145 @@ QGroupBox:title
               <number>0</number>
              </property>
              <item>
-              <layout class="QHBoxLayout" name="hlay_Depth"/>
+              <widget class="QGroupBox" name="groupBox_24">
+               <property name="font">
+                <font>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QGroupBox
+{
+	border: 1px solid black;
+	border-radius: 9px;
+	margin-top: 1em;
+}
+
+QGroupBox:title
+{
+	left: 20px;
+	top: -15px;
+	padding: 0 3px 0 3px;
+}</string>
+               </property>
+               <property name="title">
+                <string>Глубина</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <property name="leftMargin">
+                 <number>5</number>
+                </property>
+                <property name="topMargin">
+                 <number>5</number>
+                </property>
+                <property name="rightMargin">
+                 <number>5</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>5</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlay_Depth"/>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="hlay_Altitude"/>
+              <widget class="QGroupBox" name="groupBox_25">
+               <property name="font">
+                <font>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QGroupBox
+{
+	border: 1px solid black;
+	border-radius: 9px;
+	margin-top: 1em;
+}
+
+QGroupBox:title
+{
+	left: 20px;
+	top: -15px;
+	padding: 0 3px 0 3px;
+}</string>
+               </property>
+               <property name="title">
+                <string>Отстояние</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_24">
+                <property name="leftMargin">
+                 <number>5</number>
+                </property>
+                <property name="topMargin">
+                 <number>5</number>
+                </property>
+                <property name="rightMargin">
+                 <number>5</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>5</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlay_Altitude"/>
+                </item>
+               </layout>
+              </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="Line" name="line_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="2">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox
+{
+	border: 1px solid black;
+	border-radius: 9px;
+	margin-top: 1em;
+}
+
+QGroupBox:title
+{
+	left: 20px;
+	top: -15px;
+	padding: 0 3px 0 3px;
+}</string>
+            </property>
+            <property name="title">
+             <string>ВМА</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_23">
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="hlay_VMA"/>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -2060,13 +2254,13 @@ QGroupBox:title
              <widget class="ChartFormKurs" name="chartFormKurs" native="true">
               <property name="minimumSize">
                <size>
-                <width>600</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>600</width>
+                <width>0</width>
                 <height>16777215</height>
                </size>
               </property>

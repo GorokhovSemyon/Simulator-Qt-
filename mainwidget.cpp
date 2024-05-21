@@ -10,14 +10,6 @@ MainWidget::MainWidget(QWidget *parent)
     this->setWindowTitle("Interface");
 
 ///-------------------------------------------
-///Контуры курса, марша и глубины
-///-------------------------------------------
-
-    MARSH = new Marsh_contour(0.05);
-    DEPTH = new depth_contour(exch_str);
-    KURS = new kurs_contour(0.05);
-
-///-------------------------------------------
 ///Для верхней панели с метками времени
 ///-------------------------------------------
 
@@ -164,6 +156,11 @@ MainWidget::MainWidget(QWidget *parent)
                     ui->le_anpa_Y->text().toFloat(),
                     ui->le_anpa_Z->text().toFloat(),
                     exch_str->from_data.params.Psi);
+        ui->map->rovTrajectory->clear();
+
+//        ui->le_des_X->setText(ui->le_anpa_X->text());
+//        ui->le_des_Y->setText(ui->le_anpa_Y->text());
+//        ui->le_des_Z->setText(ui->le_anpa_Z->text());
     });
 
     //--------------------------------------------------
@@ -190,6 +187,18 @@ MainWidget::MainWidget(QWidget *parent)
         ui->lbl_lost_instr->setText(QString::number((long int)instr->lost_message_count));
         ui->lbl_received_instr->setText(QString::number((long int)instr->received));
 
+    });
+
+    //--------------------------------------------------
+    //По нажатию на кнопку "Задать параметры" для планировщика задаем целевую точку
+    //--------------------------------------------------
+    connect(ui->btn_set_params, &QPushButton::pressed, [this]
+    {
+        exch_str->target_params.des_X = ui->le_des_X->text().toFloat();
+        exch_str->target_params.des_Y = ui->le_des_Y->text().toFloat();
+        exch_str->target_params.des_Z = ui->le_des_Z->text().toFloat();
+
+        exch_str->target_params.navigate_complete = false; //Убираем флаг того, что аппарат достиг цели
     });
 
     //--------------------------------------------------
@@ -269,6 +278,17 @@ MainWidget::MainWidget(QWidget *parent)
     altitude = new Altitude(exch_str);
     ui->hlay_Altitude->addWidget(altitude);
 
+    depth = new Depth(exch_str);
+    ui->hlay_Depth->addWidget(depth);
+
+///-------------------------------------------
+///Контуры курса, марша и глубины
+///-------------------------------------------
+
+    MARSH = new Marsh_contour(exch_str);
+    DEPTH = new depth_contour(exch_str);
+    KURS = new kurs_contour(exch_str);
+
 ///--------------------------------------------------
 ///Связь с формой для теста интерфейса (debug_form)
 ///--------------------------------------------------
@@ -324,8 +344,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     //Дифферент текущий
     connect(debug, &Debug_Form::setPitch, hyrohorizont, &HyroHorizont::setPitch);
-//    //Глубина текущая
-//    connect(debug, &Debug_Form::setDepth, hyrohorizont, &HyroHorizont::setDepth);
+    //Глубина текущая
+    connect(debug, &Debug_Form::setDepth, depth, &Depth::setDepth);
     //Отстояние текущее
     connect(debug, &Debug_Form::setAltitude, altitude, &Altitude::setAltitude);
 }
@@ -344,35 +364,34 @@ MainWidget::~MainWidget()
     delete compass;
     delete hyrohorizont;
     delete altitude;
+    delete depth;
     delete vma;
 }
 
 //--------------------------------------------------
 
+// Блок формирования сигналов на движители
 void MainWidget::BFS()
 {
-    /// Ux = U1+U2
-
-    /// Uy = U5+U6+U7+U8
-    /// Uz = U3+U4
-    /// Upsi = U3-U4-U1+U2
-    /// Utetta = -U5+U6-U7+U8
-    /// Ugamma = -U7-U8+U6+U5
-
-    /// Блок формирования сигналов на движители
-    /// Упрощенный вариант
-
-     //Для высоты
+    //Верхний
+    exch_str->to_data.voltage[0].U = saturation(exch_str->target_params.marsh_U,10);
+    //Нижний
+    exch_str->to_data.voltage[1].U = saturation(exch_str->target_params.marsh_U,10);
+    //Левый
+    exch_str->to_data.voltage[2].U = saturation((exch_str->target_params.marsh_U + exch_str->target_params.kurs_U),10);
+    //Правый
+    exch_str->to_data.voltage[3].U = saturation((exch_str->target_params.marsh_U - exch_str->target_params.kurs_U),10);
+    //Для высоты
     exch_str->to_data.voltage[4].U = saturation(exch_str->target_params.depth_U,10);
-
- }
+}
 
  //-------------------------------------------------------------------------------------
 
+//Блок насыщения движителей
  float MainWidget::saturation(float input, float max)
  {
     if (fabs(input)>= max)
-        return (input < 0 ? max : -max);
+        return (input < 0 ? -max : max);
     else return input;
  }
 
@@ -394,13 +413,16 @@ void MainWidget::timerEvent(QTimerEvent *e)
     if (e->timerId() == id_10Hz)    ///--- 10 Гц
     {
         DEPTH->main_block(); //Расчет напряжения по глубине
+        MARSH->main_block(); //Расчет напряжения по маршу
+        KURS->main_block(); //Расчет напряжения по курсу
         BFS(); //Формируем напряжения на каждый движитель
 
 
         //Гордость отечественного костылестроения
         if (ui->le_anpa_X->text().toFloat() == exch_str->from_data.params.X
             && ui->le_anpa_Y->text().toFloat() == exch_str->from_data.params.Y
-            && ui->le_anpa_Z->text().toFloat() == exch_str->from_data.params.Z) {
+            && ui->le_anpa_Z->text().toFloat() == exch_str->from_data.params.Z)
+        {
             superImportantVariable = true;
         }
 
@@ -416,6 +438,7 @@ void MainWidget::timerEvent(QTimerEvent *e)
         compass->update();
         hyrohorizont->update();
         altitude->update();
+        depth->update();
         vma->update();
     }
 
@@ -423,8 +446,8 @@ void MainWidget::timerEvent(QTimerEvent *e)
     if (e->timerId() == id_1Hz)    ///--- 1 Гц
     {
         ui->chartFormDepth->setYT(exch_str->target_params.depth_U, operatingTime->elapsed());
-        ui->chartFormMarch->setYT(MARSH->U_marsh, operatingTime->elapsed());
-        ui->chartFormKurs->setYT(KURS->U_kurs, operatingTime->elapsed());
+        ui->chartFormMarch->setYT(exch_str->target_params.marsh_U, operatingTime->elapsed());
+        ui->chartFormKurs->setYT(exch_str->target_params.kurs_U, operatingTime->elapsed());
     }
     else
     {

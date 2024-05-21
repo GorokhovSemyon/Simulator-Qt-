@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPaintDevice>
 #include <QPaintEngine>
+#include <QPainterPath>
 #include "common/exchange_structures.h"
 
 #define U_MAX 10

@@ -1,4 +1,5 @@
 #include "different_contour.h"
+#include "mainwindow.h"
 
 different_contour::different_contour(float delta)
 {

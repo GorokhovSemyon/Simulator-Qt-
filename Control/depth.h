@@ -1,5 +1,5 @@
-#ifndef ALTITUDE_H
-#define ALTITUDE_H
+#ifndef DEPTH_H
+#define DEPTH_H
 
 #include <QWidget>
 #include <QPainter>
@@ -11,25 +11,26 @@
 #define STEP 20
 
 namespace Ui {
-class Altitude;
+class Depth;
 }
 
-class Altitude : public QWidget
+class Depth : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Altitude(Exchange_structures *_exch_str, QWidget *parent = nullptr);
-    ~Altitude();
+    explicit Depth(Exchange_structures *_exch_str, QWidget *parent = nullptr);
+    ~Depth();
 
     void paintEvent(QPaintEvent *);
 
     Exchange_structures* exch_str;
+    float depth;
 
 private:
-    Ui::Altitude *ui;
+    Ui::Depth *ui;
 
-    QPoint mark_altitude[4] = {
+    QPoint mark_depth[4] = {
         QPoint (0, 0),
         QPoint (15, 5),
         QPoint (15, -5),
@@ -37,9 +38,7 @@ private:
     };
 
 public slots:
-    void setAltitude(int _altitude);
-
-
+    void setDepth();
 };
 
-#endif // ALTITUDE_H
+#endif // DEPTH_H

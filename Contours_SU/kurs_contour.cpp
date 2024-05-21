@@ -1,183 +1,267 @@
 #include "kurs_contour.h"
 
-kurs_contour::kurs_contour(float delta)
+kurs_contour::kurs_contour(Exchange_structures *_exch_str)
 {
-    delta_t = delta;
-    //nav_algorithm = new NavigationAlgoritm();
-    target_radius = 10000;
-    //core_SU = new SU_CoreBlock(0.05);
+    exch_str = _exch_str;
+    distance = 0;
 }
 
-void kurs_contour::main_block(float Input, int Regim, int flagUpravleniya, float counter)
+void kurs_contour::main_block()
 {
-//   core_FeedBack_Distance_Speed();
+    float sumErr = 0;
+    float corrSumErr = 0;
+    float midSumOut = 0;
 
-//   X[12][0] = Input;
-//   X[1][0] = X[12][0]*K[1];
+    float K1 = 1;
+    float K2 = 1;
+    float Kc = 57.3;
+    float kConvert = 0.1;
 
-//   switch (Regim) ///--- 0 - ручной, 1 - автоматизированный, 3,4 - наведение
-//   {
+    switch (exch_str->target_params.targeting_method)
+    {
+    case 0:      //  Погоня
+       exch_str->target_params.des_Yaw = calc_hover_algorithm();
+       break;
+    case 1:      // Упреждение
+       exch_str->target_params.des_Yaw = calc_successive_lead_method();
+       break;
+    case 2:      // Линия визирования
+       exch_str->target_params.des_Yaw = calc_target_setting_method();
+       break;
 
-//       case 0:
+    default:
+       break;
+    }
 
-//           X[16][0] = X[1][0];
-//           X[4][0] = X[31][0];
+    if (!exch_str->target_params.navigate_complete)
+    sumErr = exch_str->target_params.des_Yaw - exch_str->from_data.params.Psi;
 
-//       break;
+    if (sumErr < -180) sumErr = 360 + sumErr;
+    else if (sumErr > 180) sumErr = -360 + sumErr;
 
-//       case 1:
-//       case 2:
+    if (abs(sumErr) < 3) sumErr = 0;
 
-//           if (flagUpravleniya)
-//           {
-//               X[2][0] = X[1][0];
-//               X[3][0] = X[2][0]*K[2];
+    corrSumErr = sumErr * K1;
 
-//               /*======= ПИ - регулятор ========*/
-//               /*==== C ЛБ, замораживающим накапливание =====*/
-//               X[4][0]=X[4][1]+((delta_t/2)*(X[3][0]+X[3][1])); ///---ПИ - регулятор
-//               if ((U_kurs>=K[9])&&(X[3][0]>0))    X[4][0]=X[4][1]; ///--ЛБ
-//               if ((U_kurs<=(-K[9]))&&(X[3][0]<0)) X[4][0]=X[4][1]; ///--ЛБ
-//               X[4][1]=X[4][0]; X[3][1]=X[3][0];
+    //От датчиков
+    midSumOut = corrSumErr - exch_str->from_data.params.Wy * K2;
 
-//               Kurs_scheme_mainLogic();
-//           }
-//           else X[16][0] = X[1][0];
-
-//       break;
-
-//       case 3:
-
-//               X[4][0] = X[31][0] - (dynam_su.MotionPapam.dir > 0 ? dynam_su.MotionPapam.dir : dynam_su.MotionPapam.dir);
-//               Kurs_scheme_mainLogic();
-
-//       break;
-//       case 4:
-
-//           if (dynam_su.MotionPapam.gans_dir > 180)
-//           {// так как угол приходит от 0...360 разбиваем окружность на 180град.
-
-//               dynam_su.MotionPapam.gans_dir = -(360 - dynam_su.MotionPapam.gans_dir);
-
-//           }
-//           else
-//           {
-//               dynam_su.MotionPapam.gans_dir = dynam_su.MotionPapam.gans_dir;
-//           }
-
-//           //CHECK
-//           if (dynam_su.MotionPapam.gans_update_success == true && dynam_su.MotionPapam.gans_dist > targetParam->R)
-//           {
-//                X[4][0] = X[31][0] - roundf(dynam_su.MotionPapam.gans_dir*10)/10;
-//                Kurs_scheme_mainLogic();
-//           }
-//           else
-//           {
-//                X[4][0] = X[31][0];
-//                Kurs_scheme_mainLogic();
-//           }
-
-//       break;
-
-//        case 5:
-
-//               nav_algorithm->updateCounter(counter);
-//               //CHECK
-//               nav_algorithm->define_delta_XZ(targetParam->X, targetParam->X);
-//               //CHECK
-//               switch (targetParam->targetingMethod)
-//               {
-//               case 0:      //  Погоня
-//                   nav_algorithm->calc_hover_algorithm(target_radius);
-//                   break;
-//               case 1:      // Упреждение
-//                   nav_algorithm->calc_successive_lead_method(target_radius);
-//                   break;
-//               case 2:      // Линия визирования
-//                   nav_algorithm->calc_target_setting_method(target_radius);
-//                   break;
-
-//               default:
-//                   break;
-//               }
-
-//           Kurs_scheme_mainLogic();
-
-//           break;
-
-//   }
-//   U_kurs = X[16][0];
+    exch_str->target_params.kurs_U = corrSumErr * kConvert;
 }
 
-void kurs_contour::Kurs_scheme_mainLogic()
+float kurs_contour::calc_hover_algorithm()
 {
-//    X[6][0] = X[4][0] - X[31][0];
+    float delta_x = exch_str->target_params.des_X - exch_str->from_data.params.X;
+    float delta_z = exch_str->target_params.des_Z - exch_str->from_data.params.Z;
+//    distance = sqrt(pow(delta_x,2) + pow(delta_y,2));
 
-//    if ((K[418] == 1) && (fabs(X[6][0]) > K[417]))
+    qDebug() << "delta_x" << delta_x;
+    qDebug() << "delta_z" << delta_z;
+
+    qDebug() << "qAtan2(delta_z,delta_x)*180/M_PI == " << (qAtan2(delta_z,delta_x)*180/M_PI);
+
+    if (delta_z < 0)
+    {
+        return 360 + qAtan2(delta_z,delta_x)*180/M_PI;
+    }
+    else
+    {
+        return qAtan2(delta_z,delta_x)*180/M_PI;
+    }
+}
+
+float kurs_contour::calc_successive_lead_method()
+{
+//    stop_radius = sqrt(pow(delta_x,2) + pow(delta_z,2));
+
+//    global_speed_PA = sqrt(pow(X[205][0],2) + pow(X[159][0],2));
+
+//    X[608][0] = alpha_nav = sign(X[159][0])*(acos(X[205][0]/global_speed_PA))*57.3;
+//    X[609][0] = betta_nav = sign(delta_z)*(acos(delta_x/sqrt(pow(delta_x,2) + pow(delta_z,2))))*57.3;
+
+//    X[610][0] = error_angle = alpha_nav - betta_nav;
+
+//    /*==============ОТРИЦАТЕЛЬНЫЙ ПОВОРОТ============*/
+//    if ( (X[31][0] < 360*counter) &&  X[31][0] > (-90 + (90 - betta_nav) + 360*counter) )
 //    {
-//        X[922][0] = X[6][0];
-//        if (X[922][0] > 0) X[923][0] = K[419];
-//        else X[923][0] = K[420];
-
-//        X[6][0] = 0.0f;
-//        X[924][0] = 0.0f;
-//        X[16][0] = X[923][0];
-//    }else
+//        X[4][0] = -(alpha_nav) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] < ((-180 - betta_nav) + 360*counter) && X[31][0] > (360*(counter - 1)) )
 //    {
-//        X[7][0] = X[6][0]*K[3];
-//        X[8][0] = X[7][0]*K[4];
-//        X[1104][0] = K[5] + K[62]/(cos(X[1102][0]/180*3.14)* cos(X[1101][0]/180*3.14))*(3-cos(X[1101][0]/180*3.14))/2;
+//        X[4][0] = -(betta_nav) + 360*(counter - 1) + error_angle;
+//    }
+//    if ( X[31][0] < (-90 + (90 - betta_nav) + 360*counter) && X[31][0] > ((-180 - betta_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + error_angle;
+//    }
 
-//        /*======= ПИ - регулятор ========*/
-//        X[9][0]=X[9][1]+((delta_t/2)*(X[8][0]+X[8][1]));
-//        if (X[9][0]>X[1104][0])     X[9][0]=X[1104][0];
-//        if (X[9][0]<(-X[1104][0]))  X[9][0]=(-X[1104][0]);
-//        X[9][1]=X[9][0]; X[8][1]=X[8][0];
+//    if ( X[31][0] < 360*counter && X[31][0] > (-180 + (180 - betta_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] > (-180 + betta_nav + 360*counter) && X[31][0] < (-180 + (180 - betta_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] > 360*(counter - 1) && X[31][0] < ( -180 - betta_nav + 360*counter ) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*(counter - 1) + error_angle;
+//    }
 
-//        X[10][0] = X[7][0] + X[9][0];
-//        X[11][0] = X[3][0]*K[6];
-//        X[13][0] = X[11][0] + X[10][0];
+//    /*==============ПОЛОЖИТЕЛЬНЫЙ ПОВОРОТ============*/
+//    if ( X[31][0] < (270 + (90 - betta_nav) + 360*counter) && X[31][0] > (180 - betta_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] < 360*(counter + 1) && X[31][0] > (270 + (90 - betta_nav) + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] > 360*counter && X[31][0] < (180 - betta_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*(counter - 1) + error_angle;
+//    }
 
-//        if (K[14] == 0) X[14][0] = X[13][0];
-//        else
+//    if ( X[31][0] < 360*counter && X[31][0] > (180 + (180 - betta_nav) + 360*counter) )
+//    {
+//        X[4][0] = (360 - alpha_nav) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] < (180 + (180 - betta_nav) + 360*counter) && X[31][0] > (180 - betta_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - alpha_nav) + 360*counter + error_angle;
+//    }
+//    if ( X[31][0] > 360*counter && X[31][0] < (180 - betta_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - alpha_nav) + 360*(counter - 1) + error_angle;
+//    }
+
+//    if (delta_x == 0) X[4][0] = -sign(delta_z)*(180/2);
+//    if (delta_z == 0) X[4][0] = (180/2)*(1 + sign(delta_x)*1);
+
+}
+
+float kurs_contour::calc_target_setting_method()
+{
+
+//    stop_radius = sqrt(pow(delta_x,2) + pow(delta_z,2));
+
+//    X[611][0] = prev_x = dynam_su.MotionPapam.X;
+//    X[612][0] = prev_z = dynam_su.MotionPapam.Y;
+
+//    X[613][0] = delta_x_prev = prev_x - current_x;
+//    X[614][0] = delta_z_prev = prev_z - current_z;
+
+//    global_speed_PA = sqrt(pow(X[205][0],2) + pow(X[159][0],2));
+
+//    try
+//    {
+//        if (global_speed_PA == 0)
 //        {
-//            X[13][0] = X[13][0]*K[243];
-//            X[14][0]= (cos(X[700][0])*cos(X[701][0])*X[13][0]) + K[244]*(X[52][0]*sin(X[701][0])); // в контуре курса
-//            X[14][0]=(K[246])*X[14][0];
+//            throw 0.000001f;
 //        }
-//        X[24][0] = X[14][0]*K[16];
-//        X[515][0] = X[24][0] - X[17][0];
-//        X[516][0]=1.0f;
-//        X[517][0] = X[515][0];
+//    }
+//    catch(float speed)
+//    {
+//        global_speed_PA = speed;
+//    }
 
-//        if((fabs(X[170][0]))>=K[275])
+//    X[615][0] = tetta_nav = sign(current_z - prev_z)*(acos((current_x - prev_x)/sqrt(pow(current_x - prev_x,2) + pow(current_z - prev_z,2))))*57.3;
+
+//    X[608][0] = alpha_nav = sign(target_z - prev_z)*(acos((target_x - prev_x)/sqrt(pow(target_x - prev_x,2) + pow(target_z - prev_z,2))))*57.3;
+
+//    if (roundf(delta_x_prev*100)/100 != 0 || roundf(delta_z_prev*100)/100 != 0)
+//    {
+//        vector_ANPA_KP = sqrt(pow(delta_x_prev,2) + pow(delta_z_prev,2));
+//        vector_ANPA_target = sqrt(pow(delta_x,2) + pow(delta_z,2));
+//        if (vector_ANPA_KP !=0 || vector_ANPA_target !=0)
 //        {
-//            X[517][0]=(X[515][0])*(1+K[274]*(fabs(X[170][0])-K[275]));
-//            X[516][0]=(1+K[274]*(fabs(X[170][0])-K[275]));
+//            X[609][0] = betta_nav = acos( (delta_x_prev*delta_x + delta_z_prev*delta_z)/(vector_ANPA_KP*vector_ANPA_target) )*57.3;
 //        }
+//    }
 
-//        X[518][0]=1.0f;
-//        X[924][0]=(X[517][0]);
 
-//        if((fabs(X[214][0]))>=K[67])
+//    /*==================================
+//     *         ВИЗИРОВАНИЕ
+//     * ===============================*/
+//    X[616][0] = delta_x_Target_KP = prev_x - target_x;
+//    X[617][0] = delta_z_Target_KP = prev_z - target_z;
+
+//    vector_Target_ANPA = sqrt(pow(delta_x_Target_ANPA,2) + pow(delta_z_Target_ANPA,2));
+//    vector_Target_KP = sqrt(pow(delta_x_Target_KP,2) + pow(delta_z_Target_KP,2));
+
+//    X[618][0] = betta_visor = acos( (delta_x_Target_KP*delta_x_Target_ANPA + delta_z_Target_ANPA*delta_z_Target_KP)/(vector_Target_ANPA*vector_Target_KP) )*57.3;
+
+//    try
+//    {
+//        if (betta_visor != betta_visor)
 //        {
-//            X[924][0]=(X[517][0])*(1+K[247]*(fabs(X[214][0])-K[67]));
-//            X[518][0]=(1+K[247]*(fabs(X[214][0])-K[67]));
+//            throw 0.00000001f;
 //        }
+//    }
+//    catch (float betta_visor_new)
+//    {
+//        X[618][0] = betta_visor = betta_visor_new;
+//    }
 
-//        X[16][0] = X[924][0];
+//    X[619][0] = X[619][1] + ((0.005/2)*(X[618][0] + X[618][1]));
+//    if (X[619][0] > 4) X[619][0] = 4;
+//    if (X[619][0] < -4) X[619][0] = -4;
+//    X[619][1] = X[619][0];
+//    X[618][1] = X[618][0];
 
+//    X[618][0] = betta_visor = (tetta_nav - alpha_nav > 0 ? betta_visor : -betta_visor);
+
+//    /*==============ОТРИЦАТЕЛЬНЫЙ ПОВОРОТ============*/
+//    if ( (X[31][0] < 360*counter) && X[31][0] > (-90 + (90 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] < ((-180 - alpha_nav) + 360*counter) && X[31][0] > (360*(counter - 1)) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*(counter - 1) + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] < (-90 + (90 - alpha_nav) + 360*counter) && X[31][0] > ((-180 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+
+//    if ( X[31][0] < 360*counter && X[31][0] > (-180 + (180 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] > (-180 + alpha_nav + 360*counter) && X[31][0] < (-180 + (180 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] > 360*(counter - 1) && X[31][0] < ( -180 - alpha_nav + 360*counter ) )
+//    {
+//        X[4][0] = -(alpha_nav) + 360*(counter - 1) + betta_visor + 0.15*X[619][0];
+//    }
+
+//    /*==============ПОЛОЖИТЕЛЬНЫЙ ПОВОРОТ============*/
+//    if ( X[31][0] < (270 + (90 - alpha_nav) + 360*counter) && X[31][0] > (180 - alpha_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] < 360*(counter + 1) && X[31][0] > (270 + (90 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] > 360*counter && X[31][0] < (180 - alpha_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - (alpha_nav)) + 360*(counter - 1) + betta_visor + 0.15*X[619][0];
+//    }
+
+//    if ( X[31][0] < 360*counter && X[31][0] > (180 + (180 - alpha_nav) + 360*counter) )
+//    {
+//        X[4][0] = (360 - alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] < (180 + (180 - alpha_nav) + 360*counter) && X[31][0] > (180 - alpha_nav + 360*counter) )
+//    {
+//      X[4][0] = (360 - alpha_nav) + 360*counter + betta_visor + 0.15*X[619][0];
+//    }
+//    if ( X[31][0] > 360*counter && X[31][0] < (180 - alpha_nav + 360*counter) )
+//    {
+//        X[4][0] = (360 - alpha_nav) + 360*(counter - 1) + betta_visor + 0.15*X[619][0];
 //    }
 }
-
-void kurs_contour::core_FeedBack_Distance_Speed()
-{
-//    X[19][0] = (K[15] == 1 ? X[32][0] : X[21][0]);  // переключение ключа, обратная связь по угловой скорости из блендер или угловая скорость в углах Эйлера
-//    core_SU->sensor_filter(K[8], 0.005, X[19], X[18],highfreq_ims_reinit);
-//    X[17][0] = X[18][0]*K[7];
-}
-
-//void kurs_contour::setTargetParam(PointTargetingParameters *value)
-//{
-//    targetParam = value;
-//}

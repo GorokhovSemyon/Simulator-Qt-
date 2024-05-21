@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     Control/altitude.cpp \
     Control/compass.cpp \
+    Control/depth.cpp \
     Control/hyrohorizont.cpp \
     Control/vma.cpp \
     main.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
 HEADERS += \
     Control/altitude.h \
     Control/compass.h \
+    Control/depth.h \
     Control/hyrohorizont.h \
     Control/vma.h \
     common/defines.h \
@@ -56,6 +58,7 @@ HEADERS += \
 FORMS += \
     Control/altitude.ui \
     Control/compass.ui \
+    Control/depth.ui \
     Control/hyrohorizont.ui \
     Control/vma.ui \
     mainwidget.ui \

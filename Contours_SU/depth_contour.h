@@ -1,13 +1,14 @@
 #ifndef DEPTH_CONTOUR_H
 #define DEPTH_CONTOUR_H
 
+#include <QDebug>
+
 #include "common/exchange_structures.h"
 
 class depth_contour
 {
 public:
     depth_contour(Exchange_structures *_exch_str);
-//    SU_CoreBlock* core_SU;
 
     Exchange_structures* exch_str;
 
@@ -26,12 +27,6 @@ public:
     void po_glubine(int flagUpravleniya, int Regim);
     void po_otstoyaniu(int flagUpravleniya, int Regim);
     void core_FeedBack_Distance_Speed();
-
-//    void setTargetParam(PointTargetingParameters *value);
-
-//private:
-
-//    PointTargetingParameters* targetParam;
 };
 
 #endif // DEPTH_CONTOUR_H

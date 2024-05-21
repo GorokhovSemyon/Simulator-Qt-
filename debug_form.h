@@ -42,8 +42,8 @@ signals:
 
     void setRoll(int _roll);
     void setPitch(int _pitch);
-    void setDepth(int _depth);
     void setAltitude(int _Altitude);
+    void setDepth();
 
 private:
     Ui::Debug_Form *ui;

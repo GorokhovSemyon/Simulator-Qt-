@@ -1,4 +1,5 @@
 #include "kren_contour.h"
+#include "mainwindow.h"
 
 kren_contour::kren_contour(float delta)
 {

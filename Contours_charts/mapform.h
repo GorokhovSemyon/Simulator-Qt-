@@ -27,7 +27,7 @@ public:
     QSplineSeries *rovTrajectory = nullptr;
     QScatterSeries *rovOleg = nullptr;
     QChart *chart = nullptr;
-    QValueAxis *axisX = nullptr, *axisY = nullptr;
+    QValueAxis *axisX = nullptr, *axisZ = nullptr;
     QChartView *chartView = nullptr;
     QHBoxLayout *hLayout = nullptr;
     QBrush *brushOleg=nullptr;

@@ -121,13 +121,13 @@ void Protocol_Simulator::receive_data()
         }
         else
         {
-            qDebug() << "from Protocol_BAU::receive_data(): Error checksum BAU!: check == " << check << " checksum == " << got_message.header.checksum << endl;
+            qDebug() << "from Protocol_Simulator::receive_data(): Error checksum Simulator!: check == " << check << " checksum == " << got_message.header.checksum << endl;
             lost_message_count++;
         }
     }
     else
     {
-        qDebug() << "from Protocol_BAU::receive_data(): Error header BAU!: sender == " << got_message.header.sender << " messtype == " << got_message.header.messtype << endl;
+        qDebug() << "from Protocol_Simulator::receive_data(): Error header BAU!: sender == " << got_message.header.sender << " messtype == " << got_message.header.messtype << endl;
         lost_message_count++;
     }
 

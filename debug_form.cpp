@@ -30,16 +30,11 @@ Debug_Form::Debug_Form(QWidget *parent) :
     ui->sl_pitch->setMaximum(90);
     ui->sl_pitch->setMinimum(-90);
 
-    ui->sl_depth->setValue(100);
-    ui->sl_depth->setMaximum(100);
-    ui->sl_depth->setMinimum(0);
-
     ui->sl_alt->setValue(0);
-    ui->sl_alt->setMaximum(100);
+    ui->sl_alt->setMaximum(200);
     ui->sl_alt->setMinimum(0);
 
     ui->lbl_pitch->setText("Дифферент");
-    ui->lbl_depth->setText("Глубина");
     ui->lbl_alt->setText("Отстояние");
 
     ui->lbl_yaw->setText("Курс тек.");
@@ -99,8 +94,11 @@ Debug_Form::Debug_Form(QWidget *parent) :
     connect(ui->rb_error_U5, &QCheckBox::clicked, this, &Debug_Form::setFail_U5);
 
     connect(ui->sl_pitch, &QSlider::valueChanged, this, &Debug_Form::setPitch);
-    connect(ui->sl_depth, &QSlider::valueChanged, this, &Debug_Form::setDepth);
-    connect(ui->sl_alt, &QSlider::valueChanged, this, &Debug_Form::setAltitude);
+    connect(ui->sl_alt, &QSlider::valueChanged, [=] (int value)
+    {
+        emit setAltitude(value);
+        emit setDepth();
+    });
 }
 
 Debug_Form::~Debug_Form()
