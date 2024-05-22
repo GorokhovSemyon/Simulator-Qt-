@@ -2,4 +2,4 @@
 
 ## About
 
-This is an control part implementation, what should be connected with Unity virtual scene. It's part of group project. 
+This project is a possible implementation of the control part of the simulator, the virtual environment of which is recreated in Unity. It is part of a group project.
